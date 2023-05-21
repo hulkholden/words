@@ -1,0 +1,31 @@
+load("@bazel_gazelle//:def.bzl", "gazelle")
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+
+# gazelle:prefix github.com/hulkholden/words
+gazelle(name = "gazelle")
+
+gazelle(
+    name = "gazelle-update-repos",
+    args = [
+        "-from_file=go.mod",
+        "-prune",
+    ],
+    command = "update-repos",
+)
+
+go_binary(
+    name = "words",
+    embed = [":words_lib"],
+    visibility = ["//visibility:public"],
+)
+
+go_library(
+    name = "words_lib",
+    srcs = ["main.go"],
+    embedsrcs = [
+        "templates/index.html",
+    ],
+    importpath = "github.com/hulkholden/words",
+    visibility = ["//visibility:private"],
+    deps = ["//static"],
+)
