@@ -7,7 +7,15 @@
 
 <body>
     <h1>Words</h1>
-    <div>Hello</div>
+    <div>There are {{ .WordCount }} words in the database.</div>
+    <br>
+    <div>Solutions:
+        <ul>
+            {{ range $word := .Words }}
+            <li>{{ $word }}</li>
+            {{ end }}
+        </ul>
+    </div>
 </body>
 
 </html>

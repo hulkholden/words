@@ -5,8 +5,10 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"text/template"
 
+	"github.com/hulkholden/words/solver"
 	"github.com/hulkholden/words/static"
 )
 
@@ -14,9 +16,25 @@ var (
 	//go:embed templates/*
 	templatesFS embed.FS
 	indexTmpl   = template.Must(template.ParseFS(templatesFS, "templates/index.html"))
+
+	//go:embed words.txt
+	words string
 )
 
-func index(w http.ResponseWriter, r *http.Request) {
+func parseWords(data string) map[string]bool {
+	words := make(map[string]bool)
+	for _, word := range strings.Split(data, "\n") {
+		words[word] = true
+	}
+	return words
+}
+
+type server struct {
+	wordMap map[string]bool
+	solver  solver.Solver
+}
+
+func (s server) index(w http.ResponseWriter, r *http.Request) {
 	// By default "/" matches any path - e.g. "/non-existent".
 	// Is there a way to do this when the handler is registed?
 	if r.URL.Path != "/" {
@@ -24,12 +42,21 @@ func index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := map[string]any{}
+	data := map[string]any{
+		"WordCount": len(s.wordMap),
+		"Words":     s.solver.Solve("bnasu", 'b'),
+	}
 	indexTmpl.Execute(w, data)
 }
 
 func main() {
-	http.HandleFunc("/", index)
+	wordMap := parseWords(words)
+	srv := server{
+		wordMap: wordMap,
+		solver:  solver.New(wordMap),
+	}
+
+	http.HandleFunc("/", srv.index)
 
 	staticHandler := http.FileServer(http.FS(static.FS))
 	http.Handle("/static/", http.StripPrefix("/static/", staticHandler))

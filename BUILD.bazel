@@ -24,8 +24,12 @@ go_library(
     srcs = ["main.go"],
     embedsrcs = [
         "templates/index.html",
+        "words.txt",
     ],
     importpath = "github.com/hulkholden/words",
     visibility = ["//visibility:private"],
-    deps = ["//static"],
+    deps = [
+        "//solver",
+        "//static",
+    ],
 )
