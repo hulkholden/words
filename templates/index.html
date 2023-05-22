@@ -3,13 +3,15 @@
 <head>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="/static/style.css">
+    <script type="module" src="/static/code.js"></script>
 </head>
 
 <body>
     <h1>Words</h1>
-    <div>There are {{ .WordCount }} words in the database.</div>
-    <br>
-    <div>Solutions:
+    <word-input pattern="ba_a_a"></word-input>
+    <div>
+        <p>There are {{ .WordCount }} words in the database.</p>
+        <p>Solutions:</p>
         <ul>
             {{ range $word := .Words }}
             <li>{{ $word }}</li>
@@ -17,5 +19,46 @@
         </ul>
     </div>
 </body>
+
+<template id="word-input">
+    <style>
+        .letters {
+            display: flex;
+            flex-direction: row;
+            width: fit-content;
+            background-color: #87BFFF;
+
+            padding: 1em;
+            margin: 1em;
+            gap: 1em;
+            border: none;
+            border-radius: 1em;
+
+            font-size: 1em;
+        }
+
+        .letter {
+            padding: 0.5em;
+            margin: none;
+            border: none;
+            border-bottom: 2px solid #0244A1;
+            border-radius: 0.5em;
+
+            font-family: Raleway, Helvetica, sans-serif;
+            font-size: 2em;
+            font-weight: 100;
+            text-align: center;
+        }
+
+        .letter:focus {
+            outline-color: #eb0062;
+        }
+    </style>
+    <div class="letters"></div>
+</template>
+
+<template id="letter-input">
+    <input class="letter" type="text" size=1 maxlength=1 />
+</template>
 
 </html>

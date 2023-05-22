@@ -3,7 +3,10 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 go_library(
     name = "static",
     srcs = ["embed.go"],
-    embedsrcs = ["style.css"],
+    embedsrcs = [
+        "style.css",
+        "code.js",
+    ],
     importpath = "github.com/hulkholden/words/static",
     visibility = ["//visibility:public"],
 )

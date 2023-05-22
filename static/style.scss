@@ -1,10 +1,28 @@
+* {
+    box-sizing: border-box;
+}
+
 html,
 body {
-    background: rgb(93, 144, 211);
-    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+
+    background: #D6E9FF;
+    font-family: Raleway, Helvetica, sans-serif;
+    font-size: 100%;
+    color: #0244A1;
 }
 
 h1 {
-    font-size: 24px;
+    font-size: 4em;
     font-weight: bold;
+    color: #0244A1;
+}
+
+p {
+    font-size: 1.5em;
 }
