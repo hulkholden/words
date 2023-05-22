@@ -23,48 +23,55 @@ customElements.define('word-input',
                 lettersElem.appendChild(letterNode);
                 letterElems.push(letterElem);
             }
+            this.letterElems = letterElems;
 
             for (let [i, elem] of letterElems.entries()) {
                 elem.addEventListener('keydown', (event) => {
-                    if (event.key.length == 1 && !event.metaKey && !event.ctrlKey) {
-                        if (this.isValidLetter(event.key)) {
-                            elem.value = event.key.toLowerCase();
-                        }
-                        event.preventDefault();
-                        return false;
-                    }
+                    return this.onKeyDown(elem, i, event);
                 });
                 elem.addEventListener('keyup', (event) => {
-                    let focusPrev = false;
-                    let focusNext = false;
-
-                    if (this.isValidLetter(event.key)) {
-                        elem.value = event.key.toLowerCase();
-                        focusNext = true;
-                    } else if (event.key == ' ') {
-                        elem.value = '';
-                        focusNext = true;
-                    } else if (event.key == 'Backspace') {
-                        focusPrev = true;
-                    } else {
-                        // TODO: Should we always clear the value for unknown keys?
-                        // elem.value = '';
-                    }
-
-                    if (focusPrev) {
-                        if (i > 0) {
-                            letterElems[i - 1].focus();
-                        }
-                    } else if (focusNext) {
-                        if ((i + 1) < letterElems.length) {
-                            letterElems[i + 1].focus();
-                            letterElems[i + 1].setSelectionRange(0, 0);
-                        }
-                    }
+                    return this.onKeyUp(elem, i, event);
                 });
             }
 
             shadow.append(wordNode);
+        }
+
+        onKeyDown(elem, letterIdx, event) {
+            if (event.key.length == 1 && !event.metaKey && !event.ctrlKey) {
+                if (this.isValidLetter(event.key)) {
+                    elem.value = event.key.toLowerCase();
+                }
+                event.preventDefault();
+                return false;
+            }
+        }
+
+        onKeyUp(elem, letterIdx, event) {
+            if (this.isValidLetter(event.key)) {
+                elem.value = event.key.toLowerCase();
+                this.focusNext(letterIdx);
+            } else if (event.key == ' ') {
+                elem.value = '';
+                this.focusNext(letterIdx);
+            } else if (event.key == 'Backspace') {
+                elem.value = '';
+                this.focusPrev(letterIdx);
+            } else if (event.key == 'ArrowLeft') {
+                this.focusPrev(letterIdx);
+            } else if (event.key == 'ArrowRight') {
+                this.focusNext(letterIdx);
+            }
+        }
+
+        focusPrev(letterIdx) { this.focusIdx(letterIdx - 1); }
+        focusNext(letterIdx) { this.focusIdx(letterIdx + 1); }
+
+        focusIdx(newIdx) {
+            if (newIdx >= 0 && newIdx < this.letterElems.length) {
+                this.letterElems[newIdx].focus();
+                this.letterElems[newIdx].setSelectionRange(0, 1);
+            }
         }
 
         isValidLetter(key) {
