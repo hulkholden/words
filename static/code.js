@@ -27,40 +27,37 @@ customElements.define('word-input',
 
             for (let [i, elem] of letterElems.entries()) {
                 elem.addEventListener('keydown', (event) => {
-                    return this.onKeyDown(elem, i, event);
-                });
-                elem.addEventListener('keyup', (event) => {
-                    return this.onKeyUp(elem, i, event);
+                    if (this.handleKeyDown(elem, i, event)) {
+                        event.preventDefault();
+                        return false;          
+                    }
                 });
             }
 
             shadow.append(wordNode);
         }
 
-        onKeyDown(elem, letterIdx, event) {
+        handleKeyDown(elem, letterIdx, event) {
             if (event.key.length == 1 && !event.metaKey && !event.ctrlKey) {
-                if (this.isValidLetter(event.key)) {
+                if (this.isAlphabetic(event.key)) {
                     elem.value = event.key.toLowerCase();
+                    this.focusNext(letterIdx);
+                } else if (event.key == ' ') {
+                    elem.value = '';
+                    this.focusNext(letterIdx);
                 }
-                event.preventDefault();
-                return false;
-            }
-        }
-
-        onKeyUp(elem, letterIdx, event) {
-            if (this.isValidLetter(event.key)) {
-                elem.value = event.key.toLowerCase();
-                this.focusNext(letterIdx);
-            } else if (event.key == ' ') {
-                elem.value = '';
-                this.focusNext(letterIdx);
+                // Ignore all other single keys like punctuation.
+                return true;
             } else if (event.key == 'Backspace') {
                 elem.value = '';
                 this.focusPrev(letterIdx);
+                return true;
             } else if (event.key == 'ArrowLeft') {
                 this.focusPrev(letterIdx);
+                return true;
             } else if (event.key == 'ArrowRight') {
                 this.focusNext(letterIdx);
+                return true;
             }
         }
 
@@ -74,7 +71,7 @@ customElements.define('word-input',
             }
         }
 
-        isValidLetter(key) {
+        isAlphabetic(key) {
             return key.length == 1 &&
                 ((key >= 'a' && key <= 'z') || (key >= 'A' && key <= 'Z'))
         }
