@@ -49,6 +49,22 @@ func (s server) index(w http.ResponseWriter, r *http.Request) {
 	indexTmpl.Execute(w, data)
 }
 
+// makeGzipHandler returns a HTTP HanderFunc which serves a gzipped version of the content.
+func makeGzipHandler(h http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+			h.ServeHTTP(w, r)
+			return
+		}
+		w.Header().Set("Content-Encoding", "gzip")
+		// TODO: figure this out from the underlying file if we use this for more than just the .wasm.
+		w.Header().Set("Content-Type", "application/wasm")
+		r.URL.Path += ".gz"
+		r.URL.RawPath += ".gz"
+		h.ServeHTTP(w, r)
+	}
+}
+
 func main() {
 	wordMap := parseWords(words)
 	srv := server{
@@ -60,6 +76,8 @@ func main() {
 
 	staticHandler := http.FileServer(http.FS(static.FS))
 	http.Handle("/static/", http.StripPrefix("/static/", staticHandler))
+	// If client.wasm is requested, redirect to a gzipped version.
+	http.Handle("/static/client.wasm", http.StripPrefix("/static/", makeGzipHandler(staticHandler)))
 
 	if err := http.ListenAndServe(":9090", nil); err != nil {
 		log.Println("Failed to start server", err)
