@@ -1,12 +1,35 @@
 load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
+load("//static:defs.bzl", "go_copy_sdk_file", "gzip_file")
 
 go_library(
     name = "static",
     srcs = ["embed.go"],
     embedsrcs = [
-        "style.css",
+        "client.wasm.gz",
+        "client.wasm",
         "code.js",
+        "style.css",
+        "wasm_exec.js",
     ],
     importpath = "github.com/hulkholden/words/static",
     visibility = ["//visibility:public"],
+)
+
+copy_file(
+    name = "copy_wasm_client",
+    src = "//client",
+    out = "client.wasm",
+)
+
+gzip_file(
+    name = "compress_wasm_client",
+    src = "//client",
+    out = "client.wasm.gz",
+)
+
+go_copy_sdk_file(
+    name = "wasm_exec_js",
+    out = "wasm_exec.js",
+    sdkfile = "misc/wasm/wasm_exec.js",
 )
