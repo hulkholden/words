@@ -21,16 +21,20 @@ func exportSolve() {
 		required := args[2].String()
 		log.Printf("Solving %q %q %q", pattern, valid, required)
 		results := s.Solve(pattern, valid, required)
-
-		// js.go only handles []any, not []Type.
-		anySlice := make([]any, len(results))
-		for i, s := range results {
-			anySlice[i] = s
-		}
-		return anySlice
+		return convertSlice(results)
 	})
 
 	js.Global().Get("window").Set("solve", fn)
+}
+
+// convertSlice converts a slice of any concrete type into a []any.
+// This is necessary because js.go only handles []any, not []string and so on.
+func convertSlice[T any](a []T) []any {
+	anySlice := make([]any, len(a))
+	for i, s := range a {
+		anySlice[i] = s
+	}
+	return anySlice
 }
 
 func main() {
