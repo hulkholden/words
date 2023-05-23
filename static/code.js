@@ -29,7 +29,7 @@ customElements.define('word-input',
                 elem.addEventListener('keydown', (event) => {
                     if (this.handleKeyDown(elem, i, event)) {
                         event.preventDefault();
-                        return false;          
+                        return false;
                     }
                 });
             }
