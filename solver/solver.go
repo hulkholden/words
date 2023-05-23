@@ -27,21 +27,26 @@ func (s Solver) WordCount() int {
 	return len(s.words)
 }
 
-func (s Solver) Solve(valid string, required rune) []string {
+func (s Solver) Solve(pattern, valid, required string) []string {
 	invalid := ""
-	for r := 'a'; r <= 'z'; r++ {
-		if !strings.ContainsRune(valid, r) {
-			invalid += string(r)
+	if valid != "" {
+		for r := 'a'; r <= 'z'; r++ {
+			if !strings.ContainsRune(valid, r) {
+				invalid += string(r)
+			}
 		}
 	}
 
 	var results []string
 	for word := range s.words {
-		if len(word) <= 3 {
+		if len(word) != len(pattern) {
 			continue
 		}
 
-		if !strings.ContainsRune(word, required) {
+		if !matchesPattern(word, pattern) {
+			continue
+		}
+		if !containsAll(word, required) {
 			continue
 		}
 		if strings.ContainsAny(word, invalid) {
@@ -52,4 +57,24 @@ func (s Solver) Solve(valid string, required rune) []string {
 	}
 	sort.Strings(results)
 	return results
+}
+
+func matchesPattern(s, p string) bool {
+	for i := range p {
+		pc := p[i]
+		sc := s[i]
+		if pc != '_' && sc != pc {
+			return false
+		}
+	}
+	return true
+}
+
+func containsAll(s string, required string) bool {
+	for _, r := range required {
+		if !strings.ContainsRune(s, r) {
+			return false
+		}
+	}
+	return true
 }

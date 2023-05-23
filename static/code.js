@@ -28,6 +28,7 @@ customElements.define('word-input',
             for (let [i, elem] of letterElems.entries()) {
                 elem.addEventListener('keydown', (event) => {
                     if (this.handleKeyDown(elem, i, event)) {
+                        this.updateSolution();
                         event.preventDefault();
                         return false;
                     }
@@ -74,6 +75,15 @@ customElements.define('word-input',
         isAlphabetic(key) {
             return key.length == 1 &&
                 ((key >= 'a' && key <= 'z') || (key >= 'A' && key <= 'Z'))
+        }
+
+        updateSolution() {
+            let pattern = '';
+            for (let [i, elem] of this.letterElems.entries()) {
+                let c = elem.value || '_';
+                pattern += c;
+            }
+            console.log(solve(pattern, '', ''))
         }
 
         static get observedAttributes() {

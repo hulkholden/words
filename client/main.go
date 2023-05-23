@@ -16,14 +16,11 @@ func exportSolve() {
 			// Log error?
 			return nil
 		}
-		valid := args[0].String()
-		required := args[1].String()
-		if len(required) != 1 {
-			log.Printf("Expecting 1 char for required, got %q", required)
-			return nil
-		}
-		log.Printf("Solving %q %q", valid, required)
-		results := s.Solve(valid, []rune(required)[0])
+		pattern := args[0].String()
+		valid := args[1].String()
+		required := args[2].String()
+		log.Printf("Solving %q %q %q", pattern, valid, required)
+		results := s.Solve(pattern, valid, required)
 
 		// js.go only handles []any, not []Type.
 		anySlice := make([]any, len(results))

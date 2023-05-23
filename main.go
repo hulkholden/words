@@ -33,7 +33,7 @@ func (s server) index(w http.ResponseWriter, r *http.Request) {
 
 	data := map[string]any{
 		"WordCount": s.solver.WordCount(),
-		"Words":     s.solver.Solve("bnasu", 'b'),
+		"Words":     s.solver.Solve("b_n___", "bnasu", "b"),
 	}
 	indexTmpl.Execute(w, data)
 }
