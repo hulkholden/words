@@ -22,13 +22,11 @@ go_binary(
 go_library(
     name = "words_lib",
     srcs = ["main.go"],
-    embedsrcs = [
-        "templates/index.html",
-        "words.txt",
-    ],
+    embedsrcs = ["templates/index.html"],
     importpath = "github.com/hulkholden/words",
     visibility = ["//visibility:private"],
     deps = [
+        "//data",
         "//solver",
         "//static",
     ],

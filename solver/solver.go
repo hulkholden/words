@@ -9,10 +9,22 @@ type Solver struct {
 	words map[string]bool
 }
 
-func New(words map[string]bool) Solver {
+func New(data string) Solver {
 	return Solver{
-		words: words,
+		words: parseWords(data),
 	}
+}
+
+func parseWords(data string) map[string]bool {
+	words := make(map[string]bool)
+	for _, word := range strings.Split(data, "\n") {
+		words[word] = true
+	}
+	return words
+}
+
+func (s Solver) WordCount() int {
+	return len(s.words)
 }
 
 func (s Solver) Solve(valid string, required rune) []string {

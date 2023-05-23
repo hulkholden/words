@@ -8,6 +8,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/hulkholden/words/data"
 	"github.com/hulkholden/words/solver"
 	"github.com/hulkholden/words/static"
 )
@@ -16,22 +17,10 @@ var (
 	//go:embed templates/*
 	templatesFS embed.FS
 	indexTmpl   = template.Must(template.ParseFS(templatesFS, "templates/index.html"))
-
-	//go:embed words.txt
-	words string
 )
 
-func parseWords(data string) map[string]bool {
-	words := make(map[string]bool)
-	for _, word := range strings.Split(data, "\n") {
-		words[word] = true
-	}
-	return words
-}
-
 type server struct {
-	wordMap map[string]bool
-	solver  solver.Solver
+	solver solver.Solver
 }
 
 func (s server) index(w http.ResponseWriter, r *http.Request) {
@@ -43,7 +32,7 @@ func (s server) index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := map[string]any{
-		"WordCount": len(s.wordMap),
+		"WordCount": s.solver.WordCount(),
 		"Words":     s.solver.Solve("bnasu", 'b'),
 	}
 	indexTmpl.Execute(w, data)
@@ -66,10 +55,8 @@ func makeGzipHandler(h http.Handler) http.HandlerFunc {
 }
 
 func main() {
-	wordMap := parseWords(words)
 	srv := server{
-		wordMap: wordMap,
-		solver:  solver.New(wordMap),
+		solver: solver.New(data.Words),
 	}
 
 	http.HandleFunc("/", srv.index)
