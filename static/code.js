@@ -1,3 +1,59 @@
+customElements.define('word-solver',
+    class WordSolver extends HTMLElement {
+        constructor() {
+            super();
+            this.wordcount = 0;
+        }
+
+        connectedCallback() {
+            // TODO: It seems wrong we have to make this open to be able to modify it in attributeChangedCallback.
+            const shadow = this.attachShadow({ mode: 'open' });
+            const solverTemplate = document.getElementById('word-solver');
+            const solverNode = solverTemplate.content.cloneNode(true)
+            const wordInput = solverNode.querySelector('word-input');
+
+            const solutionsElem = solverNode.querySelector('.solutions');
+            wordInput.addEventListener('solutionschanged', (event) => {
+                this.updateSolutions(solutionsElem, event.detail);
+            });
+
+            shadow.append(solverNode);
+            this.update();
+        }
+
+        updateSolutions(solutionsElem, solutions) {
+            const items = [];
+            for (let word of solutions) {
+                const liElem = document.createElement("li");
+                liElem.innerText = word;
+                items.push(liElem);
+            }
+            const ulElem = solutionsElem.querySelector('ul');
+            ulElem.replaceChildren(...items);
+        }
+
+        static get observedAttributes() {
+            return ['wordcount'];
+        }
+
+        attributeChangedCallback(property, oldValue, newValue) {
+            if (oldValue === newValue) {
+                return;
+            }
+            this[property] = newValue;
+            this.update(this.shadowRoot);
+        }
+
+        update() {
+            if (!this.shadowRoot) {
+                return;
+            }
+            const countElem = this.shadowRoot.querySelector('.word-count');
+            countElem.innerText = `${this.wordcount}`;
+        }
+    }
+);
+
 customElements.define('word-input',
     class WordInput extends HTMLElement {
         constructor() {

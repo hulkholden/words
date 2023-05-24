@@ -15,17 +15,23 @@
 
 <body>
     <h1>Words</h1>
-    <word-input pattern="ba_a_a"></word-input>
-    <div>
-        <p>There are {{ .WordCount }} words in the database.</p>
-        <p>Solutions:</p>
-        <ul>
-            {{ range $word := .Words }}
-            <li>{{ $word }}</li>
-            {{ end }}
-        </ul>
-    </div>
+    <word-solver wordcount="{{ .WordCount }} "></word-solver>
 </body>
+
+<template id="word-solver">
+    <style>
+        p {
+            font-size: 1.5em;
+        }
+    </style>
+
+    <word-input pattern="ba_a_a"></word-input>
+    <div class="solutions">
+        <p>There are <span class="word-count">?</span> words in the database.</p>
+        <p>Solutions:</p> 
+        <ul></ul>
+    </div>
+</template>
 
 <template id="word-input">
     <style>
