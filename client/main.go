@@ -12,7 +12,7 @@ func exportSolve() {
 	s := solver.New(data.Words)
 
 	fn := js.FuncOf(func(this js.Value, args []js.Value) any {
-		if len(args) < 2 {
+		if len(args) < 3 {
 			// Log error?
 			return nil
 		}
