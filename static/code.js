@@ -3,6 +3,11 @@ customElements.define('word-input',
         constructor() {
             super();
             this.pattern = '_';
+            this._solutions = [];
+        }
+
+        get solutions() {
+            return this._solutions;
         }
 
         connectedCallback() {
@@ -36,6 +41,10 @@ customElements.define('word-input',
             }
 
             shadow.append(wordNode);
+
+            // TODO: This doesn't work initially because it takes a while for solve()
+            // to be registered.
+            // this.updateSolution();
         }
 
         handleKeyDown(elem, letterIdx, event) {
@@ -83,7 +92,9 @@ customElements.define('word-input',
                 let c = elem.value || '_';
                 pattern += c;
             }
-            console.log(solve(pattern, '', ''))
+            this._solutions = solve(pattern, '', '');
+            const event = new CustomEvent("solutionschanged", { detail: this._solutions });
+            this.dispatchEvent(event);
         }
 
         static get observedAttributes() {
