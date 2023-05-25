@@ -6,8 +6,6 @@ customElements.define('word-solver',
         }
 
         connectedCallback() {
-            // TODO: It seems wrong we have to make this open to be able to modify it in attributeChangedCallback.
-            const shadow = this.attachShadow({ mode: 'open' });
             const solverTemplate = document.getElementById('word-solver');
             const solverNode = solverTemplate.content.cloneNode(true)
             const wordInput = solverNode.querySelector('word-input');
@@ -18,6 +16,9 @@ customElements.define('word-solver',
             });
 
             this.update(solverNode);
+
+            // TODO: It seems wrong we have to make this open to be able to modify it in attributeChangedCallback.
+            const shadow = this.attachShadow({ mode: 'open' });
             shadow.append(solverNode);
         }
 
