@@ -42,7 +42,9 @@ customElements.define('word-solver',
                 return;
             }
             this[property] = newValue;
-            this.update(this.shadowRoot);
+            if (this.shadowRoot) {
+                this.update(this.shadowRoot);
+            }
         }
 
         update(root) {
@@ -74,6 +76,7 @@ customElements.define('word-input',
             patternElem.value = this.pattern;
             patternElem.addEventListener('input', (event) => {
                 this.pattern = patternElem.value;
+                this.updateLetters(this.shadowRoot);
                 this.updateSolution();
             });
 
@@ -91,7 +94,7 @@ customElements.define('word-input',
                 this.updateSolution();
             });
 
-            this.updateLetters(wordNode, this.pattern);
+            this.updateLetters(wordNode);
 
             const shadow = this.attachShadow({ mode: 'open' });
             shadow.append(wordNode);
@@ -101,8 +104,8 @@ customElements.define('word-input',
             // this.updateSolution();
         }
 
-        updateLetters(root, pattern) {
-            this.letterElems = this.createLetters(pattern)
+        updateLetters(root) {
+            this.letterElems = this.createLetters()
             const lettersElem = root.querySelector('.letters');
             lettersElem.replaceChildren(...this.letterElems);
 
@@ -118,11 +121,11 @@ customElements.define('word-input',
 
         }
 
-        createLetters(pattern) {
+        createLetters() {
             const letterTemplate = document.getElementById('letter-input');
 
             const letterElems = [];
-            for (let chr of pattern) {
+            for (let chr of this.pattern) {
                 const letterNode = letterTemplate.content.cloneNode(true);
                 const letterElem = letterNode.querySelector('.letter');
                 if (chr != '_') {
@@ -196,6 +199,9 @@ customElements.define('word-input',
                 return;
             }
             this[property] = newValue;
+            if (this.shadowRoot) {
+                this.updateLetters(this.shadowRoot, this.pattern);
+            }
         }
     }
 );
