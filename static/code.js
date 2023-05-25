@@ -67,7 +67,6 @@ customElements.define('word-input',
         }
 
         connectedCallback() {
-            const shadow = this.attachShadow({ mode: 'closed' });
             const wordTemplate = document.getElementById('word-input');
             const wordNode = wordTemplate.content.cloneNode(true)
 
@@ -92,22 +91,22 @@ customElements.define('word-input',
                 this.updateSolution();
             });
 
-            const lettersElem = wordNode.querySelector('.letters');
-            const letterTemplate = document.getElementById('letter-input');
+            this.updateLetters(wordNode, this.pattern);
 
-            const letterElems = new Array();
-            for (let chr of this.pattern) {
-                const letterNode = letterTemplate.content.cloneNode(true);
-                const letterElem = letterNode.querySelector('.letter');
-                if (chr != '_') {
-                    letterElem.value = chr;
-                }
-                lettersElem.appendChild(letterNode);
-                letterElems.push(letterElem);
-            }
-            this.letterElems = letterElems;
+            const shadow = this.attachShadow({ mode: 'open' });
+            shadow.append(wordNode);
 
-            for (let [i, elem] of letterElems.entries()) {
+            // TODO: This doesn't work initially because it takes a while for solve()
+            // to be registered.
+            // this.updateSolution();
+        }
+
+        updateLetters(root, pattern) {
+            this.letterElems = this.createLetters(pattern)
+            const lettersElem = root.querySelector('.letters');
+            lettersElem.replaceChildren(...this.letterElems);
+
+            for (let [i, elem] of this.letterElems.entries()) {
                 elem.addEventListener('keydown', (event) => {
                     if (this.handleKeyDown(elem, i, event)) {
                         this.updateSolution();
@@ -117,11 +116,21 @@ customElements.define('word-input',
                 });
             }
 
-            shadow.append(wordNode);
+        }
 
-            // TODO: This doesn't work initially because it takes a while for solve()
-            // to be registered.
-            // this.updateSolution();
+        createLetters(pattern) {
+            const letterTemplate = document.getElementById('letter-input');
+
+            const letterElems = [];
+            for (let chr of pattern) {
+                const letterNode = letterTemplate.content.cloneNode(true);
+                const letterElem = letterNode.querySelector('.letter');
+                if (chr != '_') {
+                    letterElem.value = chr;
+                }
+                letterElems.push(letterElem);
+            }
+            return letterElems;
         }
 
         handleKeyDown(elem, letterIdx, event) {
