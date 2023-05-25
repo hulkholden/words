@@ -17,8 +17,8 @@ customElements.define('word-solver',
                 this.updateSolutions(solutionsElem, event.detail);
             });
 
+            this.update(solverNode);
             shadow.append(solverNode);
-            this.update();
         }
 
         updateSolutions(solutionsElem, solutions) {
@@ -44,11 +44,8 @@ customElements.define('word-solver',
             this.update(this.shadowRoot);
         }
 
-        update() {
-            if (!this.shadowRoot) {
-                return;
-            }
-            const countElem = this.shadowRoot.querySelector('.word-count');
+        update(root) {
+            const countElem = root.querySelector('.word-count');
             countElem.innerText = `${this.wordcount}`;
         }
     }
