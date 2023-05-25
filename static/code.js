@@ -58,7 +58,9 @@ customElements.define('word-input',
     class WordInput extends HTMLElement {
         constructor() {
             super();
-            this.pattern = '_';
+            this.pattern = '_______';
+            this.valid = '';
+            this.required = '';
             this._solutions = [];
         }
 
@@ -70,8 +72,29 @@ customElements.define('word-input',
             const shadow = this.attachShadow({ mode: 'closed' });
             const wordTemplate = document.getElementById('word-input');
             const wordNode = wordTemplate.content.cloneNode(true)
-            const lettersElem = wordNode.querySelector('.letters');
 
+            const patternElem = wordNode.querySelector('.pattern');
+            patternElem.value = this.pattern;
+            patternElem.addEventListener('input', (event) => {
+                this.pattern = patternElem.value;
+                this.updateSolution();
+            });
+
+            const validElem = wordNode.querySelector('.valid');
+            validElem.value = this.valid;
+            validElem.addEventListener('input', (event) => {
+                this.valid = validElem.value;
+                this.updateSolution();
+            });
+
+            const requiredElem = wordNode.querySelector('.required');
+            requiredElem.value = this.required;
+            requiredElem.addEventListener('input', (event) => {
+                this.required = requiredElem.value;
+                this.updateSolution();
+            });
+
+            const lettersElem = wordNode.querySelector('.letters');
             const letterTemplate = document.getElementById('letter-input');
 
             const letterElems = new Array();
@@ -143,18 +166,22 @@ customElements.define('word-input',
         }
 
         updateSolution() {
+            if (!this.letterElems) {
+                return;
+            }
+
             let pattern = '';
             for (let [i, elem] of this.letterElems.entries()) {
                 let c = elem.value || '_';
                 pattern += c;
             }
-            this._solutions = solve(pattern, '', '');
+            this._solutions = solve(pattern, this.valid, this.required);
             const event = new CustomEvent("solutionschanged", { detail: this._solutions });
             this.dispatchEvent(event);
         }
 
         static get observedAttributes() {
-            return ['pattern'];
+            return ['pattern', 'valid', 'required'];
         }
 
         attributeChangedCallback(property, oldValue, newValue) {
