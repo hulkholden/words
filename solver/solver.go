@@ -31,7 +31,7 @@ func (s Solver) Solve(pattern, valid, required string) []string {
 	invalid := ""
 	if valid != "" {
 		for r := 'a'; r <= 'z'; r++ {
-			if !strings.ContainsRune(valid, r) {
+			if !strings.ContainsRune(valid, r) && !strings.ContainsRune(required, r) {
 				invalid += string(r)
 			}
 		}
