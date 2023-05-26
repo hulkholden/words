@@ -35,6 +35,12 @@
 
 <template id="word-input">
     <style>
+        .widgets {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
         .alphabet {
             display: flex;
             flex-direction: column;
@@ -117,9 +123,10 @@
             outline-color: #eb0062;
         }
     </style>
-    <div class="alphabet"></div>
-    <div>Pattern <input class="pattern" type="text" /></div>
-    <div class="letters"></div>
+    <div class="widgets">
+        <div class="alphabet"></div>
+        <div class="letters"></div>
+    </div>
 </template>
 
 <template id="letter-input">

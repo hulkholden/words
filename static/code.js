@@ -72,14 +72,6 @@ customElements.define('word-input',
             const wordTemplate = document.getElementById('word-input');
             const wordNode = wordTemplate.content.cloneNode(true)
 
-            const patternElem = wordNode.querySelector('.pattern');
-            patternElem.value = this.pattern;
-            patternElem.addEventListener('input', (event) => {
-                this.pattern = patternElem.value;
-                this.updateLetters(this.shadowRoot);
-                this.updateSolution();
-            });
-
             this.updateAlphabet(wordNode);
             this.updateLetters(wordNode);
 
