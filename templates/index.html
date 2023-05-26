@@ -28,13 +28,63 @@
     <word-input pattern="ei_____" valid="dectivu" required="t"></word-input>
     <div class="solutions">
         <p>There are <span class="word-count">?</span> words in the database.</p>
-        <p>Solutions:</p> 
+        <p>Solutions:</p>
         <ul></ul>
     </div>
 </template>
 
 <template id="word-input">
     <style>
+        .alphabet {
+            display: flex;
+            flex-direction: column;
+            width: fit-content;
+            background-color: #87BFFF;
+
+            padding: 1em;
+            margin: 1em;
+            gap: 1em;
+            border: none;
+            border-radius: 1em;
+
+            font-size: 1em;
+        }
+
+        .alphabet-row {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+
+            gap: 1em;
+        }
+
+        .alphabet-letter {
+            padding: 0.5em;
+            margin: none;
+            border: none;
+            border-radius: 0.5em;
+
+            font-family: Raleway, Helvetica, sans-serif;
+            font-size: 1.5em;
+            font-weight: 100;
+            text-align: center;
+
+            background-color: #D6E9FF;
+            color: black;
+
+            width: 2em;
+        }
+
+        .alphabet-letter[state="allowed"] {
+            background-color: #FFEBAD;
+        }
+
+        .alphabet-letter[state="required"] {
+            background-color: #FFBF00;
+            color: white;
+            font-weight: bold;
+        }
+
         .letters {
             display: flex;
             flex-direction: row;
@@ -67,14 +117,17 @@
             outline-color: #eb0062;
         }
     </style>
+    <div class="alphabet"></div>
     <div>Pattern <input class="pattern" type="text" /></div>
-    <div>Valid Letters <input class="valid" type="text" /></div>
-    <div>Required Letters <input class="required" type="text" /></div>
     <div class="letters"></div>
 </template>
 
 <template id="letter-input">
     <input class="letter" type="text" size=1 maxlength=1 />
+</template>
+
+<template id="alphabet-letter">
+    <button class="alphabet-letter"></button>
 </template>
 
 </html>

@@ -80,20 +80,7 @@ customElements.define('word-input',
                 this.updateSolution();
             });
 
-            const validElem = wordNode.querySelector('.valid');
-            validElem.value = this.valid;
-            validElem.addEventListener('input', (event) => {
-                this.valid = validElem.value;
-                this.updateSolution();
-            });
-
-            const requiredElem = wordNode.querySelector('.required');
-            requiredElem.value = this.required;
-            requiredElem.addEventListener('input', (event) => {
-                this.required = requiredElem.value;
-                this.updateSolution();
-            });
-
+            this.updateAlphabet(wordNode);
             this.updateLetters(wordNode);
 
             const shadow = this.attachShadow({ mode: 'open' });
@@ -104,10 +91,59 @@ customElements.define('word-input',
             // this.updateSolution();
         }
 
+        updateAlphabet(root) {
+            const elems0 = this.createAlphabetRow("qwertyuiop");
+            const elems1 = this.createAlphabetRow("asdfghjkl");
+            const elems2 = this.createAlphabetRow("zxcvbnm");
+
+            const elem = root.querySelector('.alphabet');
+            elem.replaceChildren(elems0, elems1, elems2);
+        }
+
+        createAlphabetRow(letters) {
+            const template = document.getElementById('alphabet-letter');
+
+            const divElem = document.createElement('div');
+            divElem.classList.add('alphabet-row');
+
+            const elems = [];
+            for (let chr of letters) {
+                const node = template.content.cloneNode(true);
+                const elem = node.querySelector('.alphabet-letter');
+                elem.innerText = chr;
+                elem.value = chr;
+                elems.push(elem);
+
+                // TODO: add some state->int and int->state helpers.
+                let state = "off";
+                if (this.required.includes(chr)) {
+                    state = "required";
+                } else if (this.valid.includes(chr)) {
+                    state = "allowed";
+                }
+                elem.setAttribute("state", state);
+
+                elem.addEventListener('click', (event) => {
+                    let value = elem.getAttribute("state") || "off";
+                    if (value == "off") {
+                        value = "allowed";
+                    } else if (value == "allowed") {
+                        value = "required";
+                    } else if (value == "required") {
+                        value = "off";
+                    }
+                    elem.setAttribute("state", value);
+                    this.alphabetSelectionChanged();
+                });
+            }
+            divElem.replaceChildren(...elems);
+            return divElem;
+        }
+
         updateLetters(root) {
             this.letterElems = this.createLetters()
-            const lettersElem = root.querySelector('.letters');
-            lettersElem.replaceChildren(...this.letterElems);
+            const elem = root.querySelector('.letters');
+            elem.replaceChildren(...this.letterElems);
 
             for (let [i, elem] of this.letterElems.entries()) {
                 elem.addEventListener('keydown', (event) => {
@@ -118,22 +154,40 @@ customElements.define('word-input',
                     }
                 });
             }
+        }
 
+        alphabetSelectionChanged() {
+            const elems = this.shadowRoot.querySelectorAll('.alphabet-letter');
+
+            let valid = new Map();
+            let required = new Map();
+            for (let elem of elems) {
+                let state = elem.getAttribute("state") || "off";
+                if (state == "allowed") {
+                    valid.set(elem.value, true);
+                } else if (state == "required") {
+                    required.set(elem.value, true);
+                }
+            }
+            this.valid = Array.from(valid.keys()).sort().join('');
+            this.required = Array.from(required.keys()).sort().join('');
+            console.log(this.valid, this.required);
+            this.updateSolution();
         }
 
         createLetters() {
-            const letterTemplate = document.getElementById('letter-input');
+            const template = document.getElementById('letter-input');
 
-            const letterElems = [];
+            const elems = [];
             for (let chr of this.pattern) {
-                const letterNode = letterTemplate.content.cloneNode(true);
-                const letterElem = letterNode.querySelector('.letter');
+                const node = template.content.cloneNode(true);
+                const elem = node.querySelector('.letter');
                 if (chr != '_') {
-                    letterElem.value = chr;
+                    elem.value = chr;
                 }
-                letterElems.push(letterElem);
+                elems.push(elem);
             }
-            return letterElems;
+            return elems;
         }
 
         handleKeyDown(elem, letterIdx, event) {
