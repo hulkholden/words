@@ -31,11 +31,12 @@ customElements.define('word-solver',
             const solutionsElem = this.shadowRoot.querySelector('.solutions');
             const items = [];
             for (let word of solutions) {
-                const liElem = document.createElement("li");
-                liElem.innerText = word;
-                items.push(liElem);
+                const wordElem = document.createElement("span");
+                wordElem.classList.add("word");
+                wordElem.innerText = word;
+                items.push(wordElem);
             }
-            const ulElem = solutionsElem.querySelector('ul');
+            const ulElem = solutionsElem.querySelector('.solutions-container');
             ulElem.replaceChildren(...items);
         }
 

@@ -23,13 +23,32 @@
         p {
             font-size: 1.5em;
         }
+
+        .solutions-container {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            width: 600px;
+
+            padding: 1em;
+            gap: 1em;
+            border-radius: 1em;
+
+            background-color: #87BFFF;
+        }
+
+        .word {
+            background-color: #D6E9FF;
+            border-radius: 1em;
+            padding: 0.5em;
+        }
     </style>
 
-    <word-input pattern="ei_____" valid="dectivu" required="t"></word-input>
+    <word-input pattern="____" valid="dectivu" required="t"></word-input>
     <div class="solutions">
-        <p>There are <span class="word-count">?</span> words in the database.</p>
-        <p>Solutions:</p>
-        <ul></ul>
+        <p>Solutions</p>
+        <div class="solutions-container"></div>
+        <p>There database contains <span class="word-count">?</span> words.</p>
     </div>
 </template>
 
