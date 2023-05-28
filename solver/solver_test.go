@@ -11,6 +11,7 @@ func TestSolver_Solve(t *testing.T) {
 	s := Solver{
 		words: map[string]bool{
 			"hello":  true,
+			"ball":   true,
 			"banana": true,
 			"banaba": true,
 		},
@@ -60,6 +61,12 @@ func TestSolver_Solve(t *testing.T) {
 			pattern:  "______",
 			required: "l",
 			want:     nil,
+		},
+		"pattern has letters not in valid": {
+			pattern:  "b___",
+			valid:    "al",
+			required: "",
+			want:     []string{"ball"},
 		},
 	}
 	for tn, tc := range tests {
