@@ -129,21 +129,6 @@ customElements.define('word-input',
             return divElem;
         }
 
-        updateLetters(root) {
-            this.letterElems = this.createLetters()
-            const elem = root.querySelector('.letters');
-            elem.replaceChildren(...this.letterElems);
-
-            for (let [i, elem] of this.letterElems.entries()) {
-                elem.addEventListener('keydown', (event) => {
-                    if (this.handleKeyDown(elem, i, event)) {
-                        event.preventDefault();
-                        return false;
-                    }
-                });
-            }
-        }
-
         alphabetSelectionChanged() {
             const elems = this.shadowRoot.querySelectorAll('.alphabet-letter');
 
@@ -161,6 +146,21 @@ customElements.define('word-input',
             const requiredChars = Array.from(required.keys()).sort().join('');
             this.setAttribute("valid", validChars);
             this.setAttribute("required", requiredChars);
+        }
+
+        updateLetters(root) {
+            this.letterElems = this.createLetters()
+            const elem = root.querySelector('.letters');
+            elem.replaceChildren(...this.letterElems);
+
+            for (let [i, elem] of this.letterElems.entries()) {
+                elem.addEventListener('keydown', (event) => {
+                    if (this.handleKeyDown(elem, i, event)) {
+                        event.preventDefault();
+                        return false;
+                    }
+                });
+            }
         }
 
         createLetters() {
