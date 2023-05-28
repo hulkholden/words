@@ -24,7 +24,13 @@
             font-size: 1.5em;
         }
 
-        .solutions-container {
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .solutions {
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
@@ -44,17 +50,17 @@
         }
     </style>
 
-    <word-input pattern="____" valid="dectivu" required="t"></word-input>
-    <div class="solutions">
+    <div class="container">
+        <word-input pattern="____" valid="dectivu" required="t"></word-input>
         <p>Solutions</p>
-        <div class="solutions-container"></div>
-        <p>There database contains <span class="word-count">?</span> words.</p>
+        <div class="solutions"></div>
+        <p>The database contains <span class="word-count">?</span> words.</p>
     </div>
 </template>
 
 <template id="word-input">
     <style>
-        .widgets {
+        .container {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -142,7 +148,7 @@
             outline-color: #eb0062;
         }
     </style>
-    <div class="widgets">
+    <div class="container">
         <div class="alphabet"></div>
         <div class="letters"></div>
     </div>

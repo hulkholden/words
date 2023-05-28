@@ -36,8 +36,7 @@ customElements.define('word-solver',
                 wordElem.innerText = word;
                 items.push(wordElem);
             }
-            const ulElem = solutionsElem.querySelector('.solutions-container');
-            ulElem.replaceChildren(...items);
+            solutionsElem.replaceChildren(...items);
         }
 
         static get observedAttributes() {
