@@ -10,7 +10,7 @@ customElements.define('word-solver',
             const solverNode = solverTemplate.content.cloneNode(true)
 
             const wordInput = solverNode.querySelector('word-input');
-            wordInput.addEventListener('change', (event) => {
+            wordInput.addEventListener('change', event => {
                 this.updateSolution();
             });
 
@@ -113,7 +113,7 @@ customElements.define('word-input',
                 }
                 elem.setAttribute("state", state);
 
-                elem.addEventListener('click', (event) => {
+                elem.addEventListener('click', event => {
                     let value = elem.getAttribute("state") || "off";
                     if (value == "off") {
                         value = "allowed";
