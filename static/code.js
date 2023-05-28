@@ -191,7 +191,7 @@ customElements.define('word-input',
                 }
                 // Ignore all other single keys like punctuation.
                 return true;
-            } else if (event.key == 'Backspace') {
+            } else if (event.key == 'Backspace' || event.key == 'Delete') {
                 elem.value = '';
                 this.focusPrev(letterIdx);
                 this.lettersChanged();
