@@ -19,8 +19,8 @@ func exportSolve() {
 		pattern := args[0].String()
 		valid := args[1].String()
 		required := args[2].String()
-		log.Printf("Solving %q %q %q", pattern, valid, required)
 		results := s.Solve(pattern, valid, required)
+		log.Printf("Solve(%q, %q, %q) = %v", pattern, valid, required, results)
 		return convertSlice(results)
 	})
 

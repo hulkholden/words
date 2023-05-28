@@ -8,11 +8,10 @@ customElements.define('word-solver',
         connectedCallback() {
             const solverTemplate = document.getElementById('word-solver');
             const solverNode = solverTemplate.content.cloneNode(true)
-            const wordInput = solverNode.querySelector('word-input');
 
-            const solutionsElem = solverNode.querySelector('.solutions');
-            wordInput.addEventListener('solutionschanged', (event) => {
-                this.updateSolutions(solutionsElem, event.detail);
+            const wordInput = solverNode.querySelector('word-input');
+            wordInput.addEventListener('change', (event) => {
+                this.updateSolution();
             });
 
             this.update(solverNode);
@@ -22,7 +21,14 @@ customElements.define('word-solver',
             shadow.append(solverNode);
         }
 
-        updateSolutions(solutionsElem, solutions) {
+        updateSolution() {
+            const wordInput = this.shadowRoot.querySelector('word-input');
+            solveAsync(wordInput.pattern, wordInput.valid, wordInput.required)
+                .then(value => this.setSolutions(value));
+        }
+
+        setSolutions(solutions) {
+            const solutionsElem = this.shadowRoot.querySelector('.solutions');
             const items = [];
             for (let word of solutions) {
                 const liElem = document.createElement("li");
@@ -61,11 +67,6 @@ customElements.define('word-input',
             this.pattern = '_______';
             this.valid = '';
             this.required = '';
-            this._solutions = [];
-        }
-
-        get solutions() {
-            return this._solutions;
         }
 
         connectedCallback() {
@@ -77,10 +78,6 @@ customElements.define('word-input',
 
             const shadow = this.attachShadow({ mode: 'open' });
             shadow.append(wordNode);
-
-            // TODO: This doesn't work initially because it takes a while for solve()
-            // to be registered.
-            // this.updateSolution();
         }
 
         updateAlphabet(root) {
@@ -140,7 +137,6 @@ customElements.define('word-input',
             for (let [i, elem] of this.letterElems.entries()) {
                 elem.addEventListener('keydown', (event) => {
                     if (this.handleKeyDown(elem, i, event)) {
-                        this.updateSolution();
                         event.preventDefault();
                         return false;
                     }
@@ -161,10 +157,10 @@ customElements.define('word-input',
                     required.set(elem.value, true);
                 }
             }
-            this.valid = Array.from(valid.keys()).sort().join('');
-            this.required = Array.from(required.keys()).sort().join('');
-            console.log(this.valid, this.required);
-            this.updateSolution();
+            const validChars = Array.from(valid.keys()).sort().join('');
+            const requiredChars = Array.from(required.keys()).sort().join('');
+            this.setAttribute("valid", validChars);
+            this.setAttribute("required", requiredChars);
         }
 
         createLetters() {
@@ -187,15 +183,18 @@ customElements.define('word-input',
                 if (this.isAlphabetic(event.key)) {
                     elem.value = event.key.toLowerCase();
                     this.focusNext(letterIdx);
+                    this.lettersChanged();
                 } else if (event.key == ' ') {
                     elem.value = '';
                     this.focusNext(letterIdx);
+                    this.lettersChanged();
                 }
                 // Ignore all other single keys like punctuation.
                 return true;
             } else if (event.key == 'Backspace') {
                 elem.value = '';
                 this.focusPrev(letterIdx);
+                this.lettersChanged();
                 return true;
             } else if (event.key == 'ArrowLeft') {
                 this.focusPrev(letterIdx);
@@ -204,6 +203,15 @@ customElements.define('word-input',
                 this.focusNext(letterIdx);
                 return true;
             }
+        }
+
+        lettersChanged() {
+            let pattern = '';
+            for (let [i, elem] of this.letterElems.entries()) {
+                let c = elem.value || '_';
+                pattern += c;
+            }
+            this.setAttribute("pattern", pattern)
         }
 
         focusPrev(letterIdx) { this.focusIdx(letterIdx - 1); }
@@ -221,18 +229,8 @@ customElements.define('word-input',
                 ((key >= 'a' && key <= 'z') || (key >= 'A' && key <= 'Z'))
         }
 
-        updateSolution() {
-            if (!this.letterElems) {
-                return;
-            }
-
-            let pattern = '';
-            for (let [i, elem] of this.letterElems.entries()) {
-                let c = elem.value || '_';
-                pattern += c;
-            }
-            this._solutions = solve(pattern, this.valid, this.required);
-            const event = new CustomEvent("solutionschanged", { detail: this._solutions });
+        sendChangeEvent() {
+            const event = new Event("change");
             this.dispatchEvent(event);
         }
 
@@ -248,6 +246,16 @@ customElements.define('word-input',
             if (this.shadowRoot) {
                 this.updateLetters(this.shadowRoot, this.pattern);
             }
+            // TODO: this ends up calling solve() multiple times as the attributes are
+            // first set up. Is there a nicer way to do this?
+            this.sendChangeEvent();
         }
     }
 );
+
+async function solveAsync(pattern, valid, required) {
+    while (!window.solve) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    return window.solve(pattern, valid, required);
+}
