@@ -74,10 +74,11 @@ customElements.define('word-input',
             const wordNode = wordTemplate.content.cloneNode(true)
 
             this.updateAlphabet(wordNode);
-            this.updateLetters(wordNode);
 
             const shadow = this.attachShadow({ mode: 'open' });
             shadow.append(wordNode);
+
+            this.updateLetters();
         }
 
         updateAlphabet(root) {
@@ -148,34 +149,50 @@ customElements.define('word-input',
             this.setAttribute("required", requiredChars);
         }
 
-        updateLetters(root) {
-            this.letterElems = this.createLetters()
-            const elem = root.querySelector('.letters');
-            elem.replaceChildren(...this.letterElems);
+        letterElems() {
+            const parentElem = this.shadowRoot.querySelector('.letters');
+            return Array.from(parentElem.querySelectorAll(".letter"));
+        }
 
-            for (let [i, elem] of this.letterElems.entries()) {
-                elem.addEventListener('keydown', (event) => {
-                    if (this.handleKeyDown(elem, i, event)) {
-                        event.preventDefault();
-                        return false;
-                    }
-                });
+        updateLetters() {
+            const parentElem = this.shadowRoot.querySelector('.letters');
+            const elems = this.letterElems();
+            const letters = Array.from(this.pattern);
+            for (let [i, chr] of letters.entries()) {
+                if (chr == '_') {
+                    chr = '';
+                }
+                if (i < elems.length) {
+                    elems[i].value = chr;
+                    continue;
+                }
+                const elem = this.createLetterElement(i);
+                elem.value = chr;
+                elems.push(elem);
+                parentElem.appendChild(elem);
+            }
+
+            // Remove any elements for letters that have been deleted.
+            while (elems.length > letters.length) {
+                const elem = elems.pop();
+                parentElem.removeChild(elem);
             }
         }
 
-        createLetters() {
+        createLetterElement(idx) {
             const template = document.getElementById('letter-input');
-
-            const elems = [];
-            for (let chr of this.pattern) {
-                const node = template.content.cloneNode(true);
-                const elem = node.querySelector('.letter');
-                if (chr != '_') {
-                    elem.value = chr;
+            const node = template.content.cloneNode(true);
+            const elem = node.querySelector('.letter');
+            elem.addEventListener('keydown', event => {
+                if (this.handleKeyDown(elem, idx, event)) {
+                    event.preventDefault();
+                    return false;
                 }
-                elems.push(elem);
-            }
-            return elems;
+            });
+            elem.addEventListener('input', event => {
+                this.lettersChanged();
+            });
+            return elem;
         }
 
         handleKeyDown(elem, letterIdx, event) {
@@ -207,7 +224,7 @@ customElements.define('word-input',
 
         lettersChanged() {
             let pattern = '';
-            for (let [i, elem] of this.letterElems.entries()) {
+            for (let [i, elem] of this.letterElems().entries()) {
                 let c = elem.value || '_';
                 pattern += c;
             }
@@ -218,9 +235,10 @@ customElements.define('word-input',
         focusNext(letterIdx) { this.focusIdx(letterIdx + 1); }
 
         focusIdx(newIdx) {
-            if (newIdx >= 0 && newIdx < this.letterElems.length) {
-                this.letterElems[newIdx].focus();
-                this.letterElems[newIdx].setSelectionRange(0, 1);
+            const elems = this.letterElems();
+            if (newIdx >= 0 && newIdx < elems.length) {
+                elems[newIdx].focus();
+                elems[newIdx].setSelectionRange(0, 1);
             }
         }
 
