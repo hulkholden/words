@@ -74,6 +74,11 @@ customElements.define('word-input',
 
             this.updateAlphabet(wordNode);
 
+            const addButton = wordNode.querySelector('.add-letter');
+            addButton.addEventListener('click', event => {
+                this.addLetter();
+            })
+
             const shadow = this.attachShadow({ mode: 'open' });
             shadow.append(wordNode);
 
@@ -153,6 +158,10 @@ customElements.define('word-input',
             return Array.from(parentElem.querySelectorAll(".letter"));
         }
 
+        addLetter() {
+            this.setAttribute("pattern", this.pattern + '_');
+        }
+
         updateLetters() {
             const parentElem = this.shadowRoot.querySelector('.letters');
             const elems = this.letterElems();
@@ -165,7 +174,7 @@ customElements.define('word-input',
                     elems[i].value = chr;
                     continue;
                 }
-                const elem = this.createLetterElement(i);
+                const elem = this.createLetterElement();
                 elem.value = chr;
                 elems.push(elem);
                 parentElem.appendChild(elem);
@@ -178,12 +187,12 @@ customElements.define('word-input',
             }
         }
 
-        createLetterElement(idx) {
+        createLetterElement() {
             const template = document.getElementById('letter-input');
             const node = template.content.cloneNode(true);
             const elem = node.querySelector('.letter');
             elem.addEventListener('keydown', event => {
-                if (this.handleKeyDown(elem, idx, event)) {
+                if (this.handleKeyDown(elem, event)) {
                     event.preventDefault();
                     return false;
                 }
@@ -194,29 +203,56 @@ customElements.define('word-input',
             return elem;
         }
 
-        handleKeyDown(elem, letterIdx, event) {
+        removeLetterAtIdx(idx) {
+            const parentElem = this.shadowRoot.querySelector('.letters');
+            const elems = this.letterElems();
+            if (idx < 0 || idx >= elems.length) {
+                return;
+            }
+            parentElem.removeChild(elems[idx]);
+        }
+
+        handleKeyDown(elem, event) {
+            const elems = this.letterElems();
+            const letterIdx = elems.indexOf(elem);
+            if (letterIdx < 0) {
+                throw new Error("Element not found: " + letterIdx);
+                return;
+            }
+
             if (event.key.length == 1 && !event.metaKey && !event.ctrlKey) {
+                let advance = false;
                 if (this.isAlphabetic(event.key)) {
                     elem.value = event.key.toLowerCase();
-                    this.focusNext(letterIdx);
-                    this.lettersChanged();
+                    advance = true;
                 } else if (event.key == ' ') {
                     elem.value = '';
-                    this.focusNext(letterIdx);
-                    this.lettersChanged();
+                    advance = true;
                 }
                 // Ignore all other single keys like punctuation.
+
+                if (advance) {
+                    this.lettersChanged();
+                    if (letterIdx + 1 >= elems.length) {
+                        this.addLetter();
+                     }
+                    this.focusIdx(letterIdx + 1);
+                }
                 return true;
             } else if (event.key == 'Backspace' || event.key == 'Delete') {
-                elem.value = '';
-                this.focusPrev(letterIdx);
+                if (elem.value == '' && elems.length > 1) {
+                    this.removeLetterAtIdx(letterIdx);
+                } else {
+                    elem.value = '';
+                }
+                this.focusIdx(letterIdx - 1);
                 this.lettersChanged();
                 return true;
             } else if (event.key == 'ArrowLeft') {
-                this.focusPrev(letterIdx);
+                this.focusIdx(letterIdx - 1);
                 return true;
             } else if (event.key == 'ArrowRight') {
-                this.focusNext(letterIdx);
+                this.focusIdx(letterIdx + 1);
                 return true;
             }
         }
@@ -230,15 +266,13 @@ customElements.define('word-input',
             this.setAttribute("pattern", pattern)
         }
 
-        focusPrev(letterIdx) { this.focusIdx(letterIdx - 1); }
-        focusNext(letterIdx) { this.focusIdx(letterIdx + 1); }
-
-        focusIdx(newIdx) {
+        focusIdx(idx) {
             const elems = this.letterElems();
-            if (newIdx >= 0 && newIdx < elems.length) {
-                elems[newIdx].focus();
-                elems[newIdx].setSelectionRange(0, 1);
+            if (idx < 0 || idx >= elems.length) {
+                return;
             }
+            elems[idx].focus();
+            elems[idx].setSelectionRange(0, 1);
         }
 
         isAlphabetic(key) {
