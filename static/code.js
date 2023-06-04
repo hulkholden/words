@@ -297,8 +297,6 @@ customElements.define('word-input',
             if (this.shadowRoot) {
                 this.updateLetters(this.shadowRoot, this.pattern);
             }
-            // TODO: this ends up calling solve() multiple times as the attributes are
-            // first set up. Is there a nicer way to do this?
             this.sendChangeEvent();
         }
     }
