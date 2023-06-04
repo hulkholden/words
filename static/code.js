@@ -64,9 +64,6 @@ customElements.define('word-input',
     class WordInput extends HTMLElement {
         constructor() {
             super();
-            this.pattern = '_______';
-            this.valid = '';
-            this.required = '';
         }
 
         connectedCallback() {
@@ -286,6 +283,15 @@ customElements.define('word-input',
             this.dispatchEvent(event);
         }
 
+        set pattern(value) { this.setAttribute('pattern', value) }
+        get pattern() { return this.getAttribute('pattern') || '_______' }
+
+        set valid(value) { this.setAttribute('valid', value) }
+        get valid() { return this.getAttribute('valid') || '' }
+
+        set required(value) { this.setAttribute('required', value) }
+        get required() { return this.getAttribute('required') || '' }
+
         static get observedAttributes() {
             return ['pattern', 'valid', 'required'];
         }
@@ -294,7 +300,6 @@ customElements.define('word-input',
             if (oldValue === newValue) {
                 return;
             }
-            this[property] = newValue;
             if (this.shadowRoot) {
                 this.updateLetters(this.shadowRoot, this.pattern);
             }
