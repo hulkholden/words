@@ -45,9 +45,6 @@ customElements.define('word-solver',
         }
 
         attributeChangedCallback(property, oldValue, newValue) {
-            if (oldValue === newValue) {
-                return;
-            }
             if (this.shadowRoot) {
                 this.update(this.shadowRoot);
             }
@@ -297,9 +294,6 @@ customElements.define('word-input',
         }
 
         attributeChangedCallback(property, oldValue, newValue) {
-            if (oldValue === newValue) {
-                return;
-            }
             if (this.shadowRoot) {
                 this.updateLetters(this.shadowRoot, this.pattern);
             }
