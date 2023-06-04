@@ -19,17 +19,8 @@ customElements.define('word-solver',
             shadow.append(solverNode);
         }
 
-        set wordcount(value) {
-            this.setAttribute('wordcount', value)
-        }
-
-        get wordcount() {
-            let value = this.getAttribute('wordcount');
-            if (!value) {
-                value = 0;
-            }
-            return Number(this.getAttribute('wordcount'))
-        }
+        set wordcount(value) { this.setAttribute('wordcount', value) }
+        get wordcount() { return this.getAttribute('wordcount') || 0 }
 
         updateSolution() {
             const wordInput = this.shadowRoot.querySelector('word-input');
