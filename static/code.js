@@ -2,7 +2,6 @@ customElements.define('word-solver',
     class WordSolver extends HTMLElement {
         constructor() {
             super();
-            this.wordcount = 0;
         }
 
         connectedCallback() {
@@ -18,6 +17,18 @@ customElements.define('word-solver',
 
             const shadow = this.attachShadow({ mode: 'open' });
             shadow.append(solverNode);
+        }
+
+        set wordcount(value) {
+            this.setAttribute('wordcount', value)
+        }
+
+        get wordcount() {
+            let value = this.getAttribute('wordcount');
+            if (!value) {
+                value = 0;
+            }
+            return Number(this.getAttribute('wordcount'))
         }
 
         updateSolution() {
@@ -46,7 +57,6 @@ customElements.define('word-solver',
             if (oldValue === newValue) {
                 return;
             }
-            this[property] = newValue;
             if (this.shadowRoot) {
                 this.update(this.shadowRoot);
             }
@@ -235,7 +245,7 @@ customElements.define('word-input',
                     this.lettersChanged();
                     if (letterIdx + 1 >= elems.length) {
                         this.addLetter();
-                     }
+                    }
                     this.focusIdx(letterIdx + 1);
                 }
                 return true;
