@@ -1,62 +1,3 @@
-customElements.define('word-solver',
-    class WordSolver extends HTMLElement {
-        constructor() {
-            super();
-        }
-
-        connectedCallback() {
-            const solverTemplate = document.getElementById('word-solver');
-            const solverNode = solverTemplate.content.cloneNode(true)
-
-            const wordInput = solverNode.querySelector('word-input');
-            wordInput.addEventListener('change', event => {
-                this.updateSolution();
-            });
-
-            this.update(solverNode);
-
-            const shadow = this.attachShadow({ mode: 'open' });
-            shadow.append(solverNode);
-        }
-
-        set wordcount(value) { this.setAttribute('wordcount', value) }
-        get wordcount() { return this.getAttribute('wordcount') || 0 }
-
-        updateSolution() {
-            const wordInput = this.shadowRoot.querySelector('word-input');
-            solveAsync(wordInput.pattern, wordInput.valid, wordInput.required)
-                .then(value => this.setSolutions(value));
-        }
-
-        setSolutions(solutions) {
-            const solutionsElem = this.shadowRoot.querySelector('.solutions');
-            const items = [];
-            for (let word of solutions) {
-                const wordElem = document.createElement("span");
-                wordElem.classList.add("word");
-                wordElem.innerText = word;
-                items.push(wordElem);
-            }
-            solutionsElem.replaceChildren(...items);
-        }
-
-        static get observedAttributes() {
-            return ['wordcount'];
-        }
-
-        attributeChangedCallback(property, oldValue, newValue) {
-            if (this.shadowRoot) {
-                this.update(this.shadowRoot);
-            }
-        }
-
-        update(root) {
-            const countElem = root.querySelector('.word-count');
-            countElem.innerText = `${this.wordcount}`;
-        }
-    }
-);
-
 customElements.define('word-input',
     class WordInput extends HTMLElement {
         constructor() {
@@ -298,6 +239,67 @@ customElements.define('word-input',
                 this.updateLetters(this.shadowRoot, this.pattern);
             }
             this.sendChangeEvent();
+        }
+    }
+);
+
+customElements.define('word-solver',
+    class WordSolver extends HTMLElement {
+        constructor() {
+            super();
+        }
+
+        connectedCallback() {
+            const solverTemplate = document.getElementById('word-solver');
+            const solverNode = solverTemplate.content.cloneNode(true)
+
+            const wordInput = solverNode.querySelector('word-input');
+            wordInput.addEventListener('change', event => {
+                this.updateSolution();
+            });
+
+            this.update(solverNode);
+
+            const shadow = this.attachShadow({ mode: 'open' });
+            shadow.append(solverNode);
+
+            this.updateSolution();
+        }
+
+        set wordcount(value) { this.setAttribute('wordcount', value) }
+        get wordcount() { return this.getAttribute('wordcount') || 0 }
+
+        updateSolution() {
+            const wordInput = this.shadowRoot.querySelector('word-input');
+            solveAsync(wordInput.pattern, wordInput.valid, wordInput.required)
+                .then(value => this.setSolutions(value));
+        }
+
+        setSolutions(solutions) {
+            const solutionsElem = this.shadowRoot.querySelector('.solutions');
+            const items = [];
+            for (let word of solutions) {
+                const wordElem = document.createElement("span");
+                wordElem.classList.add("word");
+                wordElem.innerText = word;
+                items.push(wordElem);
+            }
+            solutionsElem.replaceChildren(...items);
+        }
+
+        static get observedAttributes() {
+            return ['wordcount'];
+        }
+
+        attributeChangedCallback(property, oldValue, newValue) {
+            if (this.shadowRoot) {
+                this.update(this.shadowRoot);
+            }
+        }
+
+        update(root) {
+            const countElem = root.querySelector('.word-count');
+            countElem.innerText = `${this.wordcount}`;
         }
     }
 );
