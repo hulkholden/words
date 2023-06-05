@@ -1,5 +1,7 @@
 load("@bazel_gazelle//:def.bzl", "gazelle")
 load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+load("@rules_oci//oci:defs.bzl", "oci_image", "oci_tarball")
+load("@rules_pkg//:pkg.bzl", "pkg_tar")
 
 # gazelle:prefix github.com/hulkholden/words
 gazelle(name = "gazelle")
@@ -13,8 +15,35 @@ gazelle(
     command = "update-repos",
 )
 
+oci_tarball(
+    name = "words_tarball",
+    image = ":image",
+    repo_tags = ["words:latest"],
+)
+
+oci_image(
+    name = "image",
+    base = "@distroless_base",
+    entrypoint = ["/words"],
+    tars = [":words_layer"],
+)
+
+pkg_tar(
+    name = "words_layer",
+    srcs = [":words"],
+    # include_runfiles = True
+)
+
 go_binary(
     name = "words",
+    embed = [":words_lib"],
+    goarch = "amd64",
+    goos = "linux",
+    visibility = ["//visibility:public"],
+)
+
+go_binary(
+    name = "words_native",
     embed = [":words_lib"],
     visibility = ["//visibility:public"],
 )
