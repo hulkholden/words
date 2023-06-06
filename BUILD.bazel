@@ -23,7 +23,7 @@ oci_tarball(
 
 oci_image(
     name = "image",
-    base = "@distroless_base",
+    base = "@distroless_static",
     entrypoint = ["/words"],
     tars = [":words_layer"],
 )
