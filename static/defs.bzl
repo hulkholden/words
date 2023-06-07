@@ -1,5 +1,5 @@
 """Bazel rules for copying files from the Go toolchain."""
-load("@io_bazel_rules_go//go:def.bzl", "go_context")
+load("@rules_go//go:def.bzl", "go_context")
 
 def _go_copy_sdk_file_impl(ctx):
     go = go_context(ctx)
@@ -24,10 +24,10 @@ go_copy_sdk_file = rule(
         "sdkfile": attr.string(mandatory = True),
         "out": attr.output(mandatory = True),
         "_go_context_data": attr.label(
-            default = "@io_bazel_rules_go//:go_context_data",
+            default = "@rules_go//:go_context_data",
         ),
     },
-    toolchains = ["@io_bazel_rules_go//go:toolchain"],
+    toolchains = ["@rules_go//go:toolchain"],
 )
 
 def _gzip_file_impl(ctx):

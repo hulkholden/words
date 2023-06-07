@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@rules_go//go:def.bzl", "go_library")
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("//static:defs.bzl", "go_copy_sdk_file", "gzip_file")
 
