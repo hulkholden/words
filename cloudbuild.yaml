@@ -1,12 +1,15 @@
 timeout: '600s'
 
 steps:
+
+ # TODO: replace image with gcr.io/cloud-builders/bazel:6.2.1 when available.
+
 - id: 'Bazel build'
-  name: 'gcr.io/cloud-builders/bazel'
+  name: 'gcr.io/$PROJECT_ID/bazel:6.2.1'
   args: ['build', '//:words_tarball']
 
 - id: 'Create symlink'
-  name: 'gcr.io/cloud-builders/bazel'
+  name: 'gcr.io/$PROJECT_ID/bazel:6.2.1'
   entrypoint: '/bin/bash'
   args: 
   - -ceux
