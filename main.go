@@ -2,6 +2,8 @@ package main
 
 import (
 	"embed"
+	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -17,6 +19,8 @@ var (
 	//go:embed templates/*
 	templatesFS embed.FS
 	indexTmpl   = template.Must(template.ParseFS(templatesFS, "templates/index.html"))
+
+	port = flag.Int("port", 80, "http port to listen on")
 )
 
 type server struct {
@@ -54,6 +58,8 @@ func makeGzipHandler(h http.Handler) http.HandlerFunc {
 }
 
 func main() {
+	flag.Parse()
+
 	srv := server{
 		solver: solver.New(data.Words),
 	}
@@ -65,7 +71,7 @@ func main() {
 	// If client.wasm is requested, redirect to a gzipped version.
 	http.Handle("/static/client.wasm", http.StripPrefix("/static/", makeGzipHandler(staticHandler)))
 
-	if err := http.ListenAndServe(":9090", nil); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", *port), nil); err != nil {
 		log.Println("Failed to start server", err)
 		os.Exit(1)
 	}

@@ -16,7 +16,7 @@ With docker:
 ```bash
 bazel build //:words_tarball
 docker load --input $(bazel cquery --output=files //:words_tarball)
-docker run --rm -p 9090:9090 words:latest
+docker run --rm -p 9090:80 words:latest
 ```
 
 ## Credits
