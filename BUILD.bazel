@@ -24,18 +24,18 @@ oci_tarball(
 oci_image(
     name = "image",
     base = "@distroless_static",
-    entrypoint = ["/words"],
+    entrypoint = ["/words_linux"],
     tars = [":words_layer"],
 )
 
 pkg_tar(
     name = "words_layer",
-    srcs = [":words"],
+    srcs = [":words_linux"],
     # include_runfiles = True
 )
 
 go_binary(
-    name = "words",
+    name = "words_linux",
     embed = [":words_lib"],
     goarch = "amd64",
     goos = "linux",
@@ -43,7 +43,7 @@ go_binary(
 )
 
 go_binary(
-    name = "words_native",
+    name = "words",
     embed = [":words_lib"],
     visibility = ["//visibility:public"],
 )

@@ -8,7 +8,7 @@ A web app to solve simple words games.
 Natively:
 
 ```bash
-bazel run :words_native
+bazel run :words -- --port=9090
 ```
 
 With docker:
