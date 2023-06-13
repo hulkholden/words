@@ -20,17 +20,19 @@ var (
 	templatesFS embed.FS
 	indexTmpl   = template.Must(template.ParseFS(templatesFS, "templates/index.html"))
 
-	port = flag.Int("port", 80, "http port to listen on")
+	port     = flag.Int("port", 80, "http port to listen on")
+	basePath = flag.String("base_path", "", "base path to serve on, e.g. '/foo/'")
 )
 
 type server struct {
-	solver solver.Solver
+	basePath string
+	solver   solver.Solver
 }
 
 func (s server) index(w http.ResponseWriter, r *http.Request) {
 	// By default "/" matches any path - e.g. "/non-existent".
 	// Is there a way to do this when the handler is registed?
-	if r.URL.Path != "/" {
+	if r.URL.Path != s.basePath {
 		http.NotFound(w, r)
 		return
 	}
@@ -57,19 +59,32 @@ func makeGzipHandler(h http.Handler) http.HandlerFunc {
 	}
 }
 
+func canonicalizeBasePath(s string) string {
+	bp := s
+	if !strings.HasSuffix(bp, "/") {
+		bp = bp + "/"
+	}
+	if !strings.HasPrefix(bp, "/") {
+		bp = "/" + bp
+	}
+	return bp
+}
+
 func main() {
 	flag.Parse()
 
+	basePath := canonicalizeBasePath(*basePath)
 	srv := server{
-		solver: solver.New(data.Words),
+		basePath: basePath,
+		solver:   solver.New(data.Words),
 	}
 
-	http.HandleFunc("/", srv.index)
+	http.HandleFunc(basePath, srv.index)
 
 	staticHandler := http.FileServer(http.FS(static.FS))
-	http.Handle("/static/", http.StripPrefix("/static/", staticHandler))
+	http.Handle(basePath+"static/", http.StripPrefix(basePath+"static/", staticHandler))
 	// If client.wasm is requested, redirect to a gzipped version.
-	http.Handle("/static/client.wasm", http.StripPrefix("/static/", makeGzipHandler(staticHandler)))
+	http.Handle(basePath+"static/client.wasm", http.StripPrefix(basePath+"static/", makeGzipHandler(staticHandler)))
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", *port), nil); err != nil {
 		log.Println("Failed to start server", err)

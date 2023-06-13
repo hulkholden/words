@@ -1,5 +1,5 @@
 load("@gazelle//:def.bzl", "gazelle")
-load("@rules_go//go:def.bzl", "go_binary", "go_library")
+load("@rules_go//go:def.bzl", "go_binary", "go_library", "go_test")
 load("@rules_oci//oci:defs.bzl", "oci_image", "oci_tarball")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
 
@@ -59,4 +59,10 @@ go_library(
         "//solver",
         "//static",
     ],
+)
+
+go_test(
+    name = "words_test",
+    srcs = ["main_test.go"],
+    embed = [":words_lib"],
 )
