@@ -61,9 +61,23 @@ func makeGzipHandler(h http.Handler) http.HandlerFunc {
 
 func logRequest(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("%s %s %s\n", r.RemoteAddr, r.Method, r.URL)
-		handler.ServeHTTP(w, r)
+		sr := &statusRecorder{
+			ResponseWriter: w,
+			Status:         200,
+		}
+		handler.ServeHTTP(sr, r)
+		log.Printf("%s %s %d %s\n", r.RemoteAddr, r.Method, sr.Status, r.URL)
 	})
+}
+
+type statusRecorder struct {
+	http.ResponseWriter
+	Status int
+}
+
+func (r *statusRecorder) WriteHeader(status int) {
+	r.Status = status
+	r.ResponseWriter.WriteHeader(status)
 }
 
 func canonicalizeBasePath(s string) string {
