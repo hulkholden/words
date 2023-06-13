@@ -33,7 +33,10 @@ func (s server) index(w http.ResponseWriter, r *http.Request) {
 	// By default "/" matches any path - e.g. "/non-existent".
 	// Is there a way to do this when the handler is registed?
 	if r.URL.Path != s.basePath {
-		http.NotFound(w, r)
+		// TODO: does returning 404 for "/" cause gce ingress to return 502s?
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
+		}
 		return
 	}
 
