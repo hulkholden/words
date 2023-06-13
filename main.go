@@ -59,6 +59,13 @@ func makeGzipHandler(h http.Handler) http.HandlerFunc {
 	}
 }
 
+func logRequest(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("%s %s %s\n", r.RemoteAddr, r.Method, r.URL)
+		handler.ServeHTTP(w, r)
+	})
+}
+
 func canonicalizeBasePath(s string) string {
 	bp := s
 	if !strings.HasSuffix(bp, "/") {
@@ -86,7 +93,7 @@ func main() {
 	// If client.wasm is requested, redirect to a gzipped version.
 	http.Handle(basePath+"static/client.wasm", http.StripPrefix(basePath+"static/", makeGzipHandler(staticHandler)))
 
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", *port), nil); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", *port), logRequest(http.DefaultServeMux)); err != nil {
 		log.Println("Failed to start server", err)
 		os.Exit(1)
 	}
