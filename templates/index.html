@@ -16,14 +16,11 @@
 <body>
     <h1>Words</h1>
     <word-solver wordcount="{{ .WordCount }} "></word-solver>
+    <a href="https://github.com/hulkholden/words"><img src="static/github-mark.svg" width="20" height="20" class="d-block" loading="lazy" decoding="async" alt="GitHub mark"></a>
 </body>
 
 <template id="word-solver">
     <style>
-        p {
-            font-size: 1.5em;
-        }
-
         .container {
             display: flex;
             flex-direction: column;
@@ -52,7 +49,6 @@
 
     <div class="container">
         <word-input pattern="____" valid="dectivu" required="t"></word-input>
-        <p>Solutions</p>
         <div class="solutions"></div>
         <p>The database contains <span class="word-count">?</span> words.</p>
     </div>

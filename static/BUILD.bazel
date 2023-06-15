@@ -9,6 +9,7 @@ go_library(
         "client.wasm.gz",
         "client.wasm",
         "code.js",
+        "github-mark.svg",
         "style.css",
         "wasm_exec.js",
     ],
